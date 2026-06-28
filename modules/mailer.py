@@ -5,6 +5,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from modules.utils import log_event, color
 from modules.tracker import log_event_db
+from modules import config
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "templates")
 
@@ -33,14 +34,23 @@ def send_campaign(campaign: str, targets_file: str, template_name: str):
         _show_available_templates()
         return
 
-    # ── SMTP config ────────────────────────────────────────────────────────────
-    print(color("\n[*] SMTP Configuration", "cyan"))
-    smtp_host = input(color("[>] SMTP host (e.g. smtp.gmail.com): ", "cyan")).strip()
-    smtp_port = int(input(color("[>] SMTP port (587 / 465): ", "cyan")).strip() or "587")
-    sender    = input(color("[>] Sender email: ", "cyan")).strip()
-    password  = input(color("[>] Sender password (app password): ", "cyan")).strip()
-    subject   = input(color("[>] Email subject: ", "cyan")).strip()
-    host_url  = input(color("[>] Your harvester URL (e.g. http://1.2.3.4:8080): ", "cyan")).strip()
+    # ── SMTP config — pre-fill from config.yaml if set ────────────────────────
+    print(color("\n[*] SMTP Configuration (press Enter to use config.yaml defaults)", "cyan"))
+
+    cfg_host    = config.get("smtp", "host", "")
+    cfg_port    = config.get("smtp", "port", 587)
+    cfg_sender  = config.get("smtp", "sender", "")
+    cfg_pass    = config.get("smtp", "password", "")
+    cfg_subject = config.get("smtp", "default_subject", "")
+    cfg_port_default = config.get("harvester", "port", 8080)
+
+    smtp_host = input(color(f"[>] SMTP host [{cfg_host or 'smtp.gmail.com'}]: ", "cyan")).strip() or cfg_host or "smtp.gmail.com"
+    smtp_port = input(color(f"[>] SMTP port [{cfg_port}]: ", "cyan")).strip()
+    smtp_port = int(smtp_port) if smtp_port else cfg_port
+    sender    = input(color(f"[>] Sender email [{cfg_sender or 'required'}]: ", "cyan")).strip() or cfg_sender
+    password  = input(color(f"[>] App password [{'set' if cfg_pass else 'required'}]: ", "cyan")).strip() or cfg_pass
+    subject   = input(color(f"[>] Subject [{cfg_subject or 'required'}]: ", "cyan")).strip() or cfg_subject
+    host_url  = input(color(f"[>] Harvester URL [http://localhost:{cfg_port_default}]: ", "cyan")).strip() or f"http://localhost:{cfg_port_default}"
 
     # ── Send loop ──────────────────────────────────────────────────────────────
     print(color(f"\n[*] Sending to {len(targets)} target(s)...\n", "cyan"))

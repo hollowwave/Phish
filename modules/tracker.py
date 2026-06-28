@@ -3,13 +3,18 @@ import csv
 import sqlite3
 from datetime import datetime
 from modules.utils import log_event, color
+from modules import config
 
-DB_PATH  = os.path.join(os.path.dirname(__file__), "..", "campaigns.db")
 LOGS_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "logs")
 
 
+def _db_path():
+    p = config.get("logging", "db_path", "campaigns.db")
+    return os.path.join(os.path.dirname(__file__), "..", p)
+
+
 def _get_conn():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(_db_path())
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -100,11 +105,9 @@ def view_logs(campaign=None):
     if not events:
         print(color("  No events recorded yet.", "yellow"))
     else:
-        # Summary stats
         actions = [e["action"] for e in events]
         print(color(f"  Visited: {actions.count('visited')}  |  "
                     f"Email Opened: {actions.count('email_opened')}  |  "
-                    f"Link Clicked: {actions.count('link_clicked')}  |  "
                     f"Submitted: {actions.count('credentials_submitted')}", "magenta"))
         print(color("  " + "─" * 66, "blue"))
         print(color(f"  {'#':<4} {'Campaign':<14} {'Token':<10} {'Action':<28} {'Time'}", "blue"))
@@ -123,7 +126,6 @@ def export_logs(campaign: str):
     os.makedirs(LOGS_DIR, exist_ok=True)
     conn = _get_conn()
 
-    # Export credentials
     creds = conn.execute(
         "SELECT * FROM credentials WHERE campaign = ?", (campaign,)
     ).fetchall()
@@ -135,7 +137,6 @@ def export_logs(campaign: str):
         for r in creds:
             writer.writerow(list(r))
 
-    # Export events
     evts = conn.execute(
         "SELECT * FROM events WHERE campaign = ?", (campaign,)
     ).fetchall()

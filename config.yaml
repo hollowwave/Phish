@@ -1,0 +1,20 @@
+# config.yaml — Phishing Simulation Framework Configuration
+# Edit these values before running a campaign.
+
+harvester:
+  host: "0.0.0.0"
+  port: 8080
+  redirect_url: "https://www.google.com"   # Where victim lands after submission
+  https: false                              # Set true if using SSL cert
+
+smtp:
+  host: "smtp.gmail.com"
+  port: 587
+  sender: ""                               # Your sender email
+  password: ""                             # App password
+  default_subject: "Action Required: Verify Your Account"
+
+logging:
+  log_to_file: true                        # Also write CLI output to file
+  log_file: "data/logs/session.log"        # Log file path
+  db_path: "campaigns.db"
