@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 6px; }
+    .btn { display: inline-block; padding: 12px 24px; background: #0072c6; color: #fff;
+           text-decoration: none; border-radius: 4px; font-weight: bold; }
+    .footer { margin-top: 20px; font-size: 12px; color: #999; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Action Required: Verify Your Account</h2>
+    <p>Dear User,</p>
+    <p>
+      We detected unusual sign-in activity on your account associated with
+      <strong>{{TARGET}}</strong>. To secure your account, please verify
+      your identity immediately.
+    </p>
+    <p style="text-align:center; margin: 30px 0;">
+      <a href="{{TRACKING_URL}}" class="btn">Verify My Account</a>
+    </p>
+    <p>If you did not request this, please ignore this email.</p>
+    <div class="footer">
+      &copy; 2026 Security Team &nbsp;|&nbsp; This is a simulated phishing email for security awareness training.
+    </div>
+  </div>
+  <!-- Tracking pixel -->
+  <img src="{{PIXEL_URL}}" width="1" height="1" style="display:none">
+</body>
+</html>
